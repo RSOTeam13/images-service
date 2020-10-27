@@ -13,6 +13,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -45,12 +46,42 @@ public class ImageResource {
     }
 
     @GET
-    public Response getImages() {
-        List<Image> images = imageBean.getImages(uriInfo);
-        long count = imageBean.getImagesCount();
+    public Response getImages(@QueryParam("filterIds") List<String> filterIds) {
+        List<ObjectId> parsedIds = new ArrayList<>();
+        if (!filterIds.isEmpty()) {
+            for (String id : filterIds) {
+                if (!ObjectId.isValid(id)) {
+                    return Response.status(Response.Status.BAD_REQUEST).build();
+                }
+                parsedIds.add(new ObjectId(id));
+            }
+        }
+
+        List<Image> images = imageBean.getImages(uriInfo, parsedIds);
+        long count = imageBean.getImagesCount(parsedIds);
 
         return Response.status(Response.Status.OK)
                 .entity(images)
+                .header("X-Total-Count", count)
+                .build();
+    }
+
+    @GET
+    @Path("/count")
+    public Response getImagesCount(@QueryParam("filterIds") List<String> filterIds) {
+        List<ObjectId> parsedIds = new ArrayList<>();
+        if (!filterIds.isEmpty()) {
+            for (String id : filterIds) {
+                if (!ObjectId.isValid(id)) {
+                    return Response.status(Response.Status.BAD_REQUEST).build();
+                }
+                parsedIds.add(new ObjectId(id));
+            }
+        }
+
+        long count = imageBean.getImagesCount(parsedIds);
+        return Response.status(Response.Status.OK)
+                .entity(count)
                 .header("X-Total-Count", count)
                 .build();
     }
