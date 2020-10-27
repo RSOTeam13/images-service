@@ -1,6 +1,7 @@
 package si.fri.rso.albify.imageservice.services.beans;
 
 import com.kumuluz.ee.rest.beans.QueryParameters;
+import com.mongodb.BasicDBObject;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
@@ -22,6 +23,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.in;
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
@@ -66,7 +68,12 @@ public class ImageBean {
      * @param uriInfo Filtering parameters.
      * @return List of images.
      */
-    public List<Image> getImages(UriInfo uriInfo) {
+    public List<Image> getImages(UriInfo uriInfo, List<ObjectId> filterIds) {
+        BasicDBObject query = new BasicDBObject();
+        if (!filterIds.isEmpty()) {
+            query = new BasicDBObject("_id", new BasicDBObject("$in", filterIds));
+        }
+
         QueryParameters queryParameters = QueryParameters.query(uriInfo
                 .getRequestUri()
                 .getQuery())
@@ -77,7 +84,7 @@ public class ImageBean {
 
         try {
             return imagesCollection
-                    .find()
+                    .find(query)
                     .limit(queryParameters.getLimit().intValue())
                     .skip(queryParameters.getOffset().intValue())
                     .into(new ArrayList<>())
@@ -95,9 +102,14 @@ public class ImageBean {
      * Counts images in DB.
      * @return Images count.
      */
-    public long getImagesCount() {
+    public long getImagesCount(List<ObjectId> filterIds) {
+        BasicDBObject query = new BasicDBObject();
+        if (!filterIds.isEmpty()) {
+            query = new BasicDBObject("_id", new BasicDBObject("$in", filterIds));
+        }
+
         try {
-            return imagesCollection.countDocuments();
+            return imagesCollection.countDocuments(query);
         } catch (Exception e) {
             e.printStackTrace();
             return 0;
