@@ -3,9 +3,6 @@ package si.fri.rso.albify.imageservice.models.converters;
 import si.fri.rso.albify.imageservice.lib.Image;
 import si.fri.rso.albify.imageservice.models.entities.ImageEntity;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class ImageConverter {
 
     public static Image toDto(ImageEntity entity) {
@@ -13,6 +10,8 @@ public class ImageConverter {
         Image dto = new Image();
         dto.setId(entity.getId().toString());
         dto.setCreatedAt(entity.getCreatedAt());
+        dto.setOwnerId(entity.getOwnerId().toString());
+        dto.setUrl(entity.getUrl());
 
         return dto;
 

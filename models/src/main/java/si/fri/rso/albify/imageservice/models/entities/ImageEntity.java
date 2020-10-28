@@ -7,6 +7,8 @@ public class ImageEntity {
 
     private ObjectId id;
     private Date createdAt;
+    private ObjectId ownerId;
+    private String url;
 
     public Date getCreatedAt() {
         return createdAt;
@@ -24,4 +26,19 @@ public class ImageEntity {
         this.id = id;
     }
 
+    public ObjectId getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(ObjectId ownerId) {
+        this.ownerId = ownerId;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
 }
