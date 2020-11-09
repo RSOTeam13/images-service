@@ -1,0 +1,21 @@
+sudo: required
+services:
+- docker
+language: java
+dist: bionic
+jdk:
+- openjdk14
+cache:
+  directories:
+  - "$HOME/.m2"
+env:
+  global:
+  - DOCKER_IMAGE=image-service-api:1.0.0-SNAPSHOT-$TRAVIS_JOB_NUMBER
+  - secure: I5nbT3gUsDUAcpi9Azk/tg3NwkZKb+svbYrpokxYNEnZwTSL2nMHmSIOBgrP54XCFfPg2SK5/yl1wXR47uSyBmcN9EoaK0vtLcPqsGbKiQsIBhf8d/ZdUSh8iLe/1R5ibizEONhosPXzxgGiVTpznjlxVfhLZrWiiryRTajPB1/D5J+kMlaAN+ZFaXrAVHn/qns5xxH0ytNi7oP65CbZ366LdEgZWl2i/jtwC7gyQxyn42CREB2ZzbiuD//TN9Kl6NcN2qq/guupR3Yw7YHa5U1fjD+DkuCqTD2YP9STN6vEWYXHzz3glasCzyYdPGThAGzF5oNvXzekIjjYXGUwz14wKR7LAsHyw7gVVub8R4/zTWlCAcTOwESufFPUFGEc7Y8vTuaAxFFpOILl7FAPNBFUSE4670yUsE52JeqR+RD75dDmaVlUCArrL7oF/xw5luEb798lfioVLfFMRTeB/O15sYEBrQ7AqWZjaios4xxuWMd1HZJq7ot6GEPxPCA7jtziDVZmRzGKaS02C/6yEdLPZI2BML6SiIlyfoH5xyxFfpCq2i6yXne87mINuyHfImANBS4gE1udD0JEgGkft6MRJ2wbZU+IETGQsp7NxkvjeGN2xVCbd616b5YF/SWdhrpcMGE1wz3UEhe4ub91rMz1mNjSCuJPSfiFgiUDNgI=
+  - secure: kKun3AjibbIfUavomAWIHgnpg+4W6/K1/VF4Gz+rMZzQh4IPizqCBb1JvcKE96OYG8fDG9o/LiMzx0esYeCKipzJrZ/Sxu9h/ePpis05x0funJRmSsZ1nlTOS1Ml8CdaInQ3YTystddegI+HUS7Rc8DNe1ZtwzqPq2RMfn43PfippyM3Khb2WuZSuUkAsNNmIILUlaFgsMblylcGc499oxTZehzTvByH/Z6FaXO1uEyCuC3RVIb7Y6FLri6xbCfraZCdJxFihmLQ80bR0gdQiTnr3ZRRhMpqyFOyVCaOzd3Nt8th4QtszOFIR6E90c3SAORq0YVkT+KnIcLfhJFJDKSB8I2uddAf4DEBhej4A8lk9bhmR+lMH1CFhWez2BuMZMgZe+zvdfDoAwtN/NhZa2WcsKyzJDWahOt4V8RDxl8vMUt9rFVRL3ZkhPjmr4/LzBXTqwq84CWJAM9TETHOjavaYlY2uL/n3yhbBKz+uQ612pSwg52F+xg/XGAsYQTK55gPHFnHv4D/473ytjCXoZ+/aTq/Pw+Vr8CFM7PDoGGLXXdl/VpDPTpKgobu+0z2GnaFf2SkT6v+hGwQv6Dtpy/7WuuO9joHTWevaelb7jw2vfeqM4aPYuo4mpknOMNRwbUDo97k6ZbXafGynRRE0KXd2sVkqIySWS86iV9lBNI=
+script:
+- mvn clean package -U
+- docker build -t "$DOCKER_USERNAME"/"$DOCKER_IMAGE" .
+after_success:
+- echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+- docker push "$DOCKER_USERNAME"/"$DOCKER_IMAGE"
