@@ -50,6 +50,12 @@
             <artifactId>mongodb-driver-sync</artifactId>
         </dependency>
 
+        <dependency>
+            <artifactId>kumuluzee-config-consul</artifactId>
+            <groupId>com.kumuluz.ee.config</groupId>
+            <version>${kumuluzee-config.version}</version>
+        </dependency>
+
     </dependencies>
 
 </project>
