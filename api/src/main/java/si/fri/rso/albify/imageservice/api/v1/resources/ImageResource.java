@@ -1,6 +1,7 @@
 package si.fri.rso.albify.imageservice.api.v1.resources;
 
 import org.bson.types.ObjectId;
+import si.fri.rso.albify.imageservice.config.RestProperties;
 import si.fri.rso.albify.imageservice.lib.Image;
 import si.fri.rso.albify.imageservice.models.converters.ImageConverter;
 import si.fri.rso.albify.imageservice.models.entities.ImageEntity;
@@ -31,6 +32,9 @@ public class ImageResource {
 
     @Context
     protected UriInfo uriInfo;
+
+    @Inject
+    private RestProperties properties;
 
     @GET
     @Path("/{imageId}")
@@ -104,6 +108,24 @@ public class ImageResource {
         }
 
         return Response.status(Response.Status.OK).entity(ImageConverter.toDto(entity)).build();
+    }
+
+
+    @GET
+    @Path("/config")
+    public Response getConfig() {
+
+        String response =
+                "{" +
+                        "\"maintenanceMode\": %b" +
+                        "}";
+
+        response = String.format(
+                response,
+                properties.getMaintenanceMode()
+        );
+
+        return Response.ok(response).build();
     }
 
 }

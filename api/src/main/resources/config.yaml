@@ -7,3 +7,5 @@ kumuluzee:
     base-url: http://localhost:8081
     http:
       port: 8081
+rest-config:
+  maintenance-mode: true
