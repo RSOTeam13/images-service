@@ -11,11 +11,13 @@ import com.mongodb.client.MongoDatabase;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
 import org.bson.types.ObjectId;
+import org.glassfish.jersey.server.ContainerRequest;
 import si.fri.rso.albify.imageservice.lib.Image;
 import si.fri.rso.albify.imageservice.models.converters.ImageConverter;
 import si.fri.rso.albify.imageservice.models.entities.ImageEntity;
 
 import javax.enterprise.context.RequestScoped;
+import javax.inject.Inject;
 import javax.ws.rs.core.UriInfo;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +30,9 @@ import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
 @RequestScoped
 public class ImageBean {
+
+    @Inject
+    ContainerRequest request;
 
     private Logger log = Logger.getLogger(ImageBean.class.getName());
 
@@ -120,7 +125,7 @@ public class ImageBean {
      * @param imageId Image ID.
      * @return Deleted image.
      */
-    public ImageEntity removeAlbum(String imageId) {
+    public ImageEntity removeImage(String imageId) {
         try {
             ImageEntity entity = imagesCollection.findOneAndDelete(eq("_id", new ObjectId(imageId)));
             if (entity != null && entity.getId() != null) {

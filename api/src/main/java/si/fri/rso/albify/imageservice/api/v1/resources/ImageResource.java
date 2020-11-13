@@ -5,6 +5,7 @@ import si.fri.rso.albify.imageservice.lib.Image;
 import si.fri.rso.albify.imageservice.models.converters.ImageConverter;
 import si.fri.rso.albify.imageservice.models.entities.ImageEntity;
 import si.fri.rso.albify.imageservice.services.beans.ImageBean;
+import si.fri.rso.albify.imageservice.services.filters.Authenticate;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -33,6 +34,7 @@ public class ImageResource {
 
     @GET
     @Path("/{imageId}")
+    @Authenticate
     public Response getImage(@PathParam("imageId") String imageId) {
         if (!ObjectId.isValid(imageId)) {
             return Response.status(Response.Status.BAD_REQUEST).build();
@@ -46,6 +48,7 @@ public class ImageResource {
     }
 
     @GET
+    @Authenticate
     public Response getImages(@QueryParam("filterIds") List<String> filterIds) {
         List<ObjectId> parsedIds = new ArrayList<>();
         if (!filterIds.isEmpty()) {
@@ -68,6 +71,7 @@ public class ImageResource {
 
     @GET
     @Path("/count")
+    @Authenticate
     public Response getImagesCount(@QueryParam("filterIds") List<String> filterIds) {
         List<ObjectId> parsedIds = new ArrayList<>();
         if (!filterIds.isEmpty()) {
@@ -88,12 +92,13 @@ public class ImageResource {
 
     @DELETE
     @Path("/{imageId}")
-    public Response removeAlbum(@PathParam("imageId") String imageId) {
+    @Authenticate
+    public Response removeImage(@PathParam("imageId") String imageId) {
         if (!ObjectId.isValid(imageId)) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
 
-        ImageEntity entity = imageBean.removeAlbum(imageId);
+        ImageEntity entity = imageBean.removeImage(imageId);
         if (entity == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
