@@ -52,7 +52,7 @@ public class ImageResource {
     }
 
     @GET
-    @Authenticate
+    // @Authenticate
     public Response getImages(@QueryParam("filterIds") List<String> filterIds) {
         List<ObjectId> parsedIds = new ArrayList<>();
         if (!filterIds.isEmpty()) {
