@@ -15,7 +15,7 @@ env:
   - secure: kKun3AjibbIfUavomAWIHgnpg+4W6/K1/VF4Gz+rMZzQh4IPizqCBb1JvcKE96OYG8fDG9o/LiMzx0esYeCKipzJrZ/Sxu9h/ePpis05x0funJRmSsZ1nlTOS1Ml8CdaInQ3YTystddegI+HUS7Rc8DNe1ZtwzqPq2RMfn43PfippyM3Khb2WuZSuUkAsNNmIILUlaFgsMblylcGc499oxTZehzTvByH/Z6FaXO1uEyCuC3RVIb7Y6FLri6xbCfraZCdJxFihmLQ80bR0gdQiTnr3ZRRhMpqyFOyVCaOzd3Nt8th4QtszOFIR6E90c3SAORq0YVkT+KnIcLfhJFJDKSB8I2uddAf4DEBhej4A8lk9bhmR+lMH1CFhWez2BuMZMgZe+zvdfDoAwtN/NhZa2WcsKyzJDWahOt4V8RDxl8vMUt9rFVRL3ZkhPjmr4/LzBXTqwq84CWJAM9TETHOjavaYlY2uL/n3yhbBKz+uQ612pSwg52F+xg/XGAsYQTK55gPHFnHv4D/473ytjCXoZ+/aTq/Pw+Vr8CFM7PDoGGLXXdl/VpDPTpKgobu+0z2GnaFf2SkT6v+hGwQv6Dtpy/7WuuO9joHTWevaelb7jw2vfeqM4aPYuo4mpknOMNRwbUDo97k6ZbXafGynRRE0KXd2sVkqIySWS86iV9lBNI=
 script:
 - mvn clean package -U
-- docker build -t "$DOCKER_USERNAME"/"$DOCKER_IMAGE" .
+- docker build -t "$DOCKER_USERNAME"/"$DOCKER_IMAGE" -t "$DOCKER_USERNAME"/"image-service-api:latest" .
 after_success:
 - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 - docker push "$DOCKER_USERNAME"/"$DOCKER_IMAGE"
