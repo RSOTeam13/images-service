@@ -1,5 +1,6 @@
 package si.fri.rso.albify.imageservice.api.v1.resources;
 
+import com.kumuluz.ee.logs.cdi.Log;
 import org.bson.types.ObjectId;
 import si.fri.rso.albify.imageservice.config.RestProperties;
 import si.fri.rso.albify.imageservice.lib.Image;
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+@Log
 @ApplicationScoped
 @Path("/images")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -52,7 +54,7 @@ public class ImageResource {
     }
 
     @GET
-    // @Authenticate
+    @Authenticate
     public Response getImages(@QueryParam("filterIds") List<String> filterIds) {
         List<ObjectId> parsedIds = new ArrayList<>();
         if (!filterIds.isEmpty()) {
