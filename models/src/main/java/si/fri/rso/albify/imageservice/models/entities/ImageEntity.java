@@ -1,6 +1,8 @@
 package si.fri.rso.albify.imageservice.models.entities;
 
 import org.bson.types.ObjectId;
+
+import java.util.ArrayList;
 import java.util.Date;
 
 public class ImageEntity {
@@ -9,6 +11,8 @@ public class ImageEntity {
     private Date createdAt;
     private ObjectId ownerId;
     private String url;
+    private ArrayList<String> tags;
+    private Boolean visible;
 
     public Date getCreatedAt() {
         return createdAt;
@@ -40,5 +44,21 @@ public class ImageEntity {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public ArrayList<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(ArrayList<String> tags) {
+        this.tags = tags;
+    }
+
+    public Boolean getVisible() {
+        return visible;
+    }
+
+    public void setVisible(Boolean id) {
+        this.visible = visible;
     }
 }

@@ -1,6 +1,7 @@
 package si.fri.rso.albify.imageservice.api.v1.resources;
 
 import org.bson.types.ObjectId;
+import org.glassfish.jersey.server.ContainerRequest;
 import si.fri.rso.albify.imageservice.config.RestProperties;
 import si.fri.rso.albify.imageservice.lib.Image;
 import si.fri.rso.albify.imageservice.models.converters.ImageConverter;
@@ -16,6 +17,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -126,6 +129,30 @@ public class ImageResource {
         );
 
         return Response.ok(response).build();
+    }
+
+    @PUT
+    @Path("/{imageId}/visibility")
+    @Authenticate
+    public Response addImageToAlbum(@PathParam("imageId") String imageId,  @DefaultValue("true") @QueryParam("visible") Boolean visible, @Context ContainerRequest request) {
+        if (!ObjectId.isValid(imageId)) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+
+        ImageEntity entity = imageBean.getImage(imageId);
+        if (entity == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+        if (!entity.getOwnerId().toString().equals(request.getProperty("userId").toString())) {
+            return Response.status(Response.Status.FORBIDDEN).build();
+        }
+
+        ImageEntity updatedEntity = imageBean.updateVisiblity(imageId, visible);
+        if (updatedEntity == null) {
+            return Response.status(500, "There was a problem while adding image to album.").build();
+        }
+        return Response.status(Response.Status.OK).entity(ImageConverter.toDto(updatedEntity)).build();
     }
 
 }

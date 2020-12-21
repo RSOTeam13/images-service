@@ -8,6 +8,8 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.FindOneAndUpdateOptions;
+import com.mongodb.client.model.ReturnDocument;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
 import org.bson.types.ObjectId;
@@ -128,6 +130,29 @@ public class ImageBean {
     public ImageEntity removeImage(String imageId) {
         try {
             ImageEntity entity = imagesCollection.findOneAndDelete(eq("_id", new ObjectId(imageId)));
+            if (entity != null && entity.getId() != null) {
+                return entity;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * Updates image is visibility.
+     * @param imageId Image ID.
+     * @param visible Whether the image is to be made visible or not.
+     * @return Updated album.
+     */
+    public ImageEntity updateVisiblity(String imageId, Boolean visible) {
+        try {
+            ImageEntity entity = imagesCollection.findOneAndUpdate(
+                    eq("_id", new ObjectId(imageId)),
+                    new BasicDBObject("$set", new BasicDBObject("visible", visible)),
+                    new FindOneAndUpdateOptions().returnDocument(ReturnDocument.AFTER)
+            );
+
             if (entity != null && entity.getId() != null) {
                 return entity;
             }
