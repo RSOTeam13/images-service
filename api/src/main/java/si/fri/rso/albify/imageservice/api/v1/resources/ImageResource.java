@@ -42,12 +42,15 @@ public class ImageResource {
     @GET
     @Path("/{imageId}")
     @Authenticate
-    public Response getImage(@PathParam("imageId") String imageId) {
+    public Response getImage(@PathParam("imageId") String imageId, @Context ContainerRequest request) {
         if (!ObjectId.isValid(imageId)) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
 
         ImageEntity entity = imageBean.getImage(imageId);
+        if (!entity.getVisible() && !entity.getOwnerId().toString().equals(request.getProperty("userId").toString())) {
+            return Response.status(Response.Status.FORBIDDEN).build();
+        }
         if (entity == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
@@ -55,8 +58,8 @@ public class ImageResource {
     }
 
     @GET
-    // @Authenticate
-    public Response getImages(@QueryParam("filterIds") List<String> filterIds) {
+    @Authenticate
+    public Response getImages(@QueryParam("filterIds") List<String> filterIds, @Context ContainerRequest request) {
         List<ObjectId> parsedIds = new ArrayList<>();
         if (!filterIds.isEmpty()) {
             for (String id : filterIds) {
@@ -68,6 +71,11 @@ public class ImageResource {
         }
 
         List<Image> images = imageBean.getImages(uriInfo, parsedIds);
+        for (Image img : images) {
+            if (!img.getVisible() && !img.getOwnerId().toString().equals(request.getProperty("userId").toString())) {
+                return Response.status(Response.Status.FORBIDDEN).build();
+            }
+        }
         long count = imageBean.getImagesCount(parsedIds);
 
         return Response.status(Response.Status.OK)
@@ -140,12 +148,11 @@ public class ImageResource {
         }
 
         ImageEntity entity = imageBean.getImage(imageId);
-        if (entity == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
-
         if (!entity.getOwnerId().toString().equals(request.getProperty("userId").toString())) {
             return Response.status(Response.Status.FORBIDDEN).build();
+        }
+        if (entity == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
         }
 
         ImageEntity updatedEntity = imageBean.updateVisiblity(imageId, visible);

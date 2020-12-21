@@ -9,6 +9,7 @@ public class Image {
     private String ownerId;
     private String url;
     private String[] tags;
+    private Boolean visible;
 
     public Date getCreatedAt() {
         return createdAt;
@@ -48,5 +49,13 @@ public class Image {
 
     public void setTags(String[] tags) {
         this.tags = tags;
+    }
+
+    public Boolean getVisible() {
+        return visible;
+    }
+
+    public void setVisible(Boolean visible) {
+        this.visible = visible;
     }
 }
