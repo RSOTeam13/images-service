@@ -1,5 +1,6 @@
 package si.fri.rso.albify.imageservice.api.v1.resources;
 
+import com.kumuluz.ee.logs.cdi.Log;
 import org.bson.types.ObjectId;
 import org.glassfish.jersey.server.ContainerRequest;
 import si.fri.rso.albify.imageservice.config.RestProperties;
@@ -17,11 +18,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
+@Log
 @ApplicationScoped
 @Path("/images")
 @Consumes(MediaType.APPLICATION_JSON)
