@@ -42,24 +42,6 @@ public class ImageResource {
     private RestProperties properties;
 
     @GET
-    @Path("/{imageId}")
-    @Authenticate
-    public Response getImage(@PathParam("imageId") String imageId, @Context ContainerRequest request) {
-        if (!ObjectId.isValid(imageId)) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
-        }
-
-        ImageEntity entity = imageBean.getImage(imageId);
-        if (!entity.getVisible() && !entity.getOwnerId().toString().equals(request.getProperty("userId").toString())) {
-            return Response.status(Response.Status.FORBIDDEN).build();
-        }
-        if (entity == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
-        return Response.status(Response.Status.OK).entity(ImageConverter.toDto(entity)).build();
-    }
-
-    @GET
     @Authenticate
     public Response getImages(@QueryParam("filterIds") List<String> filterIds, @Context ContainerRequest request) {
         List<ObjectId> parsedIds = new ArrayList<>();
@@ -187,6 +169,24 @@ public class ImageResource {
             return Response.status(500, "There was a problem while adding image to album.").build();
         }
         return Response.status(Response.Status.OK).entity(ImageConverter.toDto(updatedEntity)).build();
+    }
+
+    @GET
+    @Path("/{imageId}")
+    @Authenticate
+    public Response getImage(@PathParam("imageId") String imageId, @Context ContainerRequest request) {
+        if (!ObjectId.isValid(imageId)) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+
+        ImageEntity entity = imageBean.getImage(imageId);
+        if (!entity.getVisible() && !entity.getOwnerId().toString().equals(request.getProperty("userId").toString())) {
+            return Response.status(Response.Status.FORBIDDEN).build();
+        }
+        if (entity == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        return Response.status(Response.Status.OK).entity(ImageConverter.toDto(entity)).build();
     }
 
 }
