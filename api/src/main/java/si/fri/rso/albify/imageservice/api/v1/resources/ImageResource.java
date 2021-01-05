@@ -27,7 +27,7 @@ import java.util.logging.Logger;
 @Path("/images")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-@CrossOrigin(name = "image-resource")
+@CrossOrigin(name = "images-resource")
 public class ImageResource {
 
     private Logger log = Logger.getLogger(ImageResource.class.getName());
@@ -72,12 +72,15 @@ public class ImageResource {
             }
         }
 
-        List<Image> images = imageBean.getImages(uriInfo, parsedIds);
+        /**
+
         for (Image img : images) {
             if (!img.getVisible() && !img.getOwnerId().toString().equals(request.getProperty("userId").toString())) {
                 return Response.status(Response.Status.FORBIDDEN).build();
             }
         }
+         **/
+        List<Image> images = imageBean.getImages(uriInfo, parsedIds);
         long count = imageBean.getImagesCount(parsedIds);
 
         return Response.status(Response.Status.OK)
