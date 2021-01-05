@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
@@ -75,6 +76,7 @@ public class ImageBean {
      * @return List of images.
      */
     public List<Image> getImages(UriInfo uriInfo, List<ObjectId> filterIds) {
+        String userId = request.getProperty("userId").toString();
         BasicDBObject query = new BasicDBObject();
         if (!filterIds.isEmpty()) {
             query = new BasicDBObject("_id", new BasicDBObject("$in", filterIds));
@@ -90,7 +92,12 @@ public class ImageBean {
 
         try {
             return imagesCollection
-                    .find(query)
+                    .find(
+                            and(
+                                    eq("ownerId", new ObjectId(userId)),
+                                    query
+                            )
+                    )
                     .limit(queryParameters.getLimit().intValue())
                     .skip(queryParameters.getOffset().intValue())
                     .into(new ArrayList<>())

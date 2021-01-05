@@ -7,6 +7,12 @@ kumuluzee:
     base-url: http://localhost:8081
     http:
       port: 8081
+  cors-filter:
+    annotations:
+      images-resource:
+        allow-origin: "http://localhost:3000"
+        allow-subdomains: true
+        supported-methods: "GET, POST, DELETE, HEAD, OPTIONS, PUT"
 
   logs:
     # Change host and port to working current logit.io account.
