@@ -1,5 +1,6 @@
 package si.fri.rso.albify.imageservice.api.v1.resources;
 
+import com.kumuluz.ee.cors.annotations.CrossOrigin;
 import com.kumuluz.ee.logs.cdi.Log;
 import org.bson.types.ObjectId;
 import org.glassfish.jersey.server.ContainerRequest;
@@ -26,6 +27,7 @@ import java.util.logging.Logger;
 @Path("/images")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
+@CrossOrigin(name = "image-resource")
 public class ImageResource {
 
     private Logger log = Logger.getLogger(ImageResource.class.getName());
