@@ -90,6 +90,27 @@ public class ImageResource {
     }
 
     @GET
+    @Authenticate
+    public Response getImagesVisible(@Context ContainerRequest request) {
+
+        /**
+
+         for (Image img : images) {
+         if (!img.getVisible() && !img.getOwnerId().toString().equals(request.getProperty("userId").toString())) {
+         return Response.status(Response.Status.FORBIDDEN).build();
+         }
+         }
+         **/
+        List<Image> images = imageBean.getImagesVisible(uriInfo);
+        long count = imageBean.getImagesCountVisible();
+
+        return Response.status(Response.Status.OK)
+                .entity(images)
+                .header("X-Total-Count", count)
+                .build();
+    }
+
+    @GET
     @Path("/count")
     @Authenticate
     public Response getImagesCount(@QueryParam("filterIds") List<String> filterIds) {
@@ -160,7 +181,7 @@ public class ImageResource {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
 
-        ImageEntity updatedEntity = imageBean.updateVisiblity(imageId, visible);
+        ImageEntity updatedEntity = imageBean.updateVisibility(imageId, visible);
         if (updatedEntity == null) {
             return Response.status(500, "There was a problem while adding image to album.").build();
         }
