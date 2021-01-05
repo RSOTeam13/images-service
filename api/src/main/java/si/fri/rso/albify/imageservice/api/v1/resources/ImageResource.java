@@ -90,6 +90,7 @@ public class ImageResource {
     }
 
     @GET
+    @Path("/visible")
     @Authenticate
     public Response getImagesVisible(@Context ContainerRequest request) {
 
