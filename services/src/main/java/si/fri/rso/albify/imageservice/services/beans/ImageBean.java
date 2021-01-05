@@ -12,6 +12,7 @@ import com.mongodb.client.model.FindOneAndUpdateOptions;
 import com.mongodb.client.model.ReturnDocument;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
+import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.glassfish.jersey.server.ContainerRequest;
 import si.fri.rso.albify.imageservice.lib.Image;
@@ -26,8 +27,7 @@ import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import static com.mongodb.client.model.Filters.and;
-import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.*;
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
@@ -112,6 +112,62 @@ public class ImageBean {
     }
 
     /**
+     * Returns list of visible images you don't own.
+     * @return List of images.
+     */
+    public List<Image> getImagesVisible(UriInfo uriInfo) {
+        String userId = request.getProperty("userId").toString();
+        Bson query = eq("visible", true);
+
+        QueryParameters queryParameters = QueryParameters.query(uriInfo
+                .getRequestUri()
+                .getQuery())
+                .defaultOffset(0)
+                .defaultLimit(100)
+                .maxLimit(100)
+                .build();
+
+        try {
+            return imagesCollection
+                    .find(
+                            and(
+                                    ne("ownerId", new ObjectId(userId)),
+                                    query
+                            )
+                    )
+                    .limit(queryParameters.getLimit().intValue())
+                    .skip(queryParameters.getOffset().intValue())
+                    .into(new ArrayList<>())
+                    .stream()
+                    .map(ImageConverter::toDto)
+                    .collect(Collectors.toList());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Counts visible images in DB.
+     * @return Images count.
+     */
+    public long getImagesCountVisible() {
+        String userId = request.getProperty("userId").toString();
+        Bson query = and(
+                ne("ownerId", new ObjectId(userId)),
+                eq("visible", true)
+        );
+
+        try {
+            return imagesCollection.countDocuments(query);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    /**
      * Counts images in DB.
      * @return Images count.
      */
@@ -152,7 +208,7 @@ public class ImageBean {
      * @param visible Whether the image is to be made visible or not.
      * @return Updated album.
      */
-    public ImageEntity updateVisiblity(String imageId, Boolean visible) {
+    public ImageEntity updateVisibility(String imageId, Boolean visible) {
         try {
             ImageEntity entity = imagesCollection.findOneAndUpdate(
                     eq("_id", new ObjectId(imageId)),

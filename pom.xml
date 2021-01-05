@@ -85,6 +85,12 @@
                 <artifactId>mongodb-driver-sync</artifactId>
                 <version>4.1.1</version>
             </dependency>
+
+            <dependency>
+                <groupId>com.kumuluz.ee.cors</groupId>
+                <artifactId>kumuluzee-cors</artifactId>
+                <version>${kumuluzee-cors.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

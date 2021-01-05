@@ -32,6 +32,10 @@
             <groupId>si.fri.rso.albify</groupId>
             <artifactId>image-service-services</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.kumuluz.ee.cors</groupId>
+            <artifactId>kumuluzee-cors</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
