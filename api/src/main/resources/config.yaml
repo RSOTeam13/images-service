@@ -4,13 +4,13 @@ kumuluzee:
     name: dev
   version: 1.0.0
   server:
-    base-url: http://localhost:8081
+    base-url: http://localhost:8080
     http:
-      port: 8081
+      port: 8080
   cors-filter:
     annotations:
       images-resource:
-        allow-origin: "http://localhost:3000"
+        allow-origin: "*"
         allow-subdomains: true
         supported-methods: "GET, POST, DELETE, HEAD, OPTIONS, PUT"
 
