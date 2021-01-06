@@ -14,6 +14,9 @@ import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
+import org.eclipse.microprofile.faulttolerance.Bulkhead;
+import org.eclipse.microprofile.faulttolerance.Fallback;
+import org.eclipse.microprofile.faulttolerance.Retry;
 import org.glassfish.jersey.server.ContainerRequest;
 import si.fri.rso.albify.imageservice.lib.Image;
 import si.fri.rso.albify.imageservice.models.converters.ImageConverter;
@@ -22,6 +25,7 @@ import si.fri.rso.albify.imageservice.models.entities.ImageEntity;
 import javax.annotation.PreDestroy;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.util.ArrayList;
 import java.util.List;
@@ -69,7 +73,18 @@ public class ImageBean {
      * @param imageId Image ID.
      * @return Image entity.
      */
-    public ImageEntity getImage(String imageId) {
+    @Bulkhead()
+    @Retry()
+    public ImageEntity getImage(String imageId, Boolean forceFail, Boolean thirdFail) throws Exception {
+        log.info("Getting image " + imageId);
+        if (!ObjectId.isValid(imageId) || forceFail) {
+            log.info("Force failing for " + imageId);
+            throw new Exception("Forced fail!");
+        }
+        if (thirdFail && Math.random() < 1 / 3) {
+            log.info("Unlucky! Fell inro the 33% that fail :/ for img: " + imageId);
+            throw new Exception("Third fail!");
+        }
         try {
             ImageEntity entity = imagesCollection.find(eq("_id", new ObjectId(imageId))).first();
             if (entity != null && entity.getId() != null) {
@@ -86,7 +101,14 @@ public class ImageBean {
      * @param uriInfo Filtering parameters.
      * @return List of images.
      */
-    public List<Image> getImages(UriInfo uriInfo, List<ObjectId> filterIds) {
+    @Fallback(fallbackMethod = "getImagesFallback")
+    public List<Image> getImages(UriInfo uriInfo, List<ObjectId> filterIds, Boolean forceFail) throws Exception {
+
+        log.info("Getting images");
+        if (forceFail) {
+            log.info("Force failing for images");
+            throw new Exception("List forced fail");
+        }
         String userId = request.getProperty("userId").toString();
         BasicDBObject query = new BasicDBObject();
         if (!filterIds.isEmpty()) {
@@ -120,6 +142,10 @@ public class ImageBean {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public List<Image> getImages(UriInfo uriInfo, List<ObjectId> filterIds) throws Exception {
+        return this.getImages(uriInfo, filterIds, false);
     }
 
     /**
@@ -234,6 +260,10 @@ public class ImageBean {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public List<Image> getImagesFallback(UriInfo uriInfo, List<ObjectId> filterIds, Boolean forceFail) {
+        return new ArrayList<>();
     }
 
 }

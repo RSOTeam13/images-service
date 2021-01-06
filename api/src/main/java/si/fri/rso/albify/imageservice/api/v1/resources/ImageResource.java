@@ -3,8 +3,6 @@ package si.fri.rso.albify.imageservice.api.v1.resources;
 import com.kumuluz.ee.cors.annotations.CrossOrigin;
 import com.kumuluz.ee.logs.cdi.Log;
 import org.bson.types.ObjectId;
-import org.eclipse.microprofile.faulttolerance.Bulkhead;
-import org.eclipse.microprofile.faulttolerance.Retry;
 import org.glassfish.jersey.server.ContainerRequest;
 import si.fri.rso.albify.imageservice.config.RestProperties;
 import si.fri.rso.albify.imageservice.lib.Image;
@@ -45,7 +43,7 @@ public class ImageResource {
 
     @GET
     @Authenticate
-    public Response getImages(@QueryParam("filterIds") List<String> filterIds, @Context ContainerRequest request) {
+    public Response getImages(@QueryParam("filterIds") List<String> filterIds, @DefaultValue("false") @QueryParam("forceFail") Boolean forceFail, @Context ContainerRequest request) throws Exception {
         List<ObjectId> parsedIds = new ArrayList<>();
         if (!filterIds.isEmpty()) {
             for (String id : filterIds) {
@@ -64,7 +62,7 @@ public class ImageResource {
             }
         }
          **/
-        List<Image> images = imageBean.getImages(uriInfo, parsedIds);
+        List<Image> images = imageBean.getImages(uriInfo, parsedIds, forceFail);
         long count = imageBean.getImagesCount(parsedIds);
 
         return Response.status(Response.Status.OK)
@@ -153,12 +151,12 @@ public class ImageResource {
     @PUT
     @Path("/{imageId}/visibility")
     @Authenticate
-    public Response addImageToAlbum(@PathParam("imageId") String imageId,  @DefaultValue("true") @QueryParam("visible") Boolean visible, @Context ContainerRequest request) {
+    public Response addImageToAlbum(@PathParam("imageId") String imageId,  @DefaultValue("true") @QueryParam("visible") Boolean visible, @Context ContainerRequest request) throws Exception {
         if (!ObjectId.isValid(imageId)) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
 
-        ImageEntity entity = imageBean.getImage(imageId);
+        ImageEntity entity = imageBean.getImage(imageId, false, false);
         if (!entity.getOwnerId().toString().equals(request.getProperty("userId").toString())) {
             return Response.status(Response.Status.FORBIDDEN).build();
         }
@@ -176,20 +174,12 @@ public class ImageResource {
     @GET
     @Path("/{imageId}")
     @Authenticate
-    @Bulkhead()
-    @Retry()
-    public Response getImage(@PathParam("imageId") String imageId, @DefaultValue("false") @QueryParam("forceFail") Boolean forceFail,  @DefaultValue("false") @QueryParam("thirdFail") Boolean thirdFail, @Context ContainerRequest request) {
-        log.info("Getting image " + imageId);
-        if (!ObjectId.isValid(imageId) || forceFail) {
-            log.info("Force failing for " + imageId);
+    public Response getImage(@PathParam("imageId") String imageId, @DefaultValue("false") @QueryParam("forceFail") Boolean forceFail,  @DefaultValue("false") @QueryParam("thirdFail") Boolean thirdFail, @Context ContainerRequest request) throws Exception {
+        if (!ObjectId.isValid(imageId)) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
-        if (thirdFail && Math.random() < 1 / 3) {
-            log.info("Unlucky! Fell inro the 33% that fail :/ for img: " + imageId);
-            return Response.status(Response.Status.BAD_REQUEST).build();
-        }
-        ImageEntity entity = imageBean.getImage(imageId);
-        if (!entity.getVisible() && !entity.getOwnerId().toString().equals(request.getProperty("userId").toString())) {
+        ImageEntity entity = imageBean.getImage(imageId, forceFail, thirdFail);
+        if ((entity.getVisible() == null || !entity.getVisible()) && !entity.getOwnerId().toString().equals(request.getProperty("userId").toString())) {
             return Response.status(Response.Status.FORBIDDEN).build();
         }
         if (entity == null) {
