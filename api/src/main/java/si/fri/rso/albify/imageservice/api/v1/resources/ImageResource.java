@@ -176,8 +176,8 @@ public class ImageResource {
     @GET
     @Path("/{imageId}")
     @Authenticate
-    @Bulkhead()
-    @Retry()
+//    @Bulkhead()
+//    @Retry()
     public Response getImage(@PathParam("imageId") String imageId, @DefaultValue("false") @QueryParam("forceFail") Boolean forceFail,  @DefaultValue("false") @QueryParam("thirdFail") Boolean thirdFail, @Context ContainerRequest request) {
         log.info("Getting image " + imageId);
         if (!ObjectId.isValid(imageId) || forceFail) {
