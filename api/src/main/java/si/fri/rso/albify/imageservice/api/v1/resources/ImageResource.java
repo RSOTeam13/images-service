@@ -3,8 +3,8 @@ package si.fri.rso.albify.imageservice.api.v1.resources;
 import com.kumuluz.ee.cors.annotations.CrossOrigin;
 import com.kumuluz.ee.logs.cdi.Log;
 import org.bson.types.ObjectId;
-//import org.eclipse.microprofile.faulttolerance.Bulkhead;
-//import org.eclipse.microprofile.faulttolerance.Retry;
+import org.eclipse.microprofile.faulttolerance.Bulkhead;
+import org.eclipse.microprofile.faulttolerance.Retry;
 import org.glassfish.jersey.server.ContainerRequest;
 import si.fri.rso.albify.imageservice.config.RestProperties;
 import si.fri.rso.albify.imageservice.lib.Image;
@@ -176,8 +176,8 @@ public class ImageResource {
     @GET
     @Path("/{imageId}")
     @Authenticate
-//    @Bulkhead()
-//    @Retry()
+    @Bulkhead()
+    @Retry()
     public Response getImage(@PathParam("imageId") String imageId, @DefaultValue("false") @QueryParam("forceFail") Boolean forceFail,  @DefaultValue("false") @QueryParam("thirdFail") Boolean thirdFail, @Context ContainerRequest request) {
         log.info("Getting image " + imageId);
         if (!ObjectId.isValid(imageId) || forceFail) {
