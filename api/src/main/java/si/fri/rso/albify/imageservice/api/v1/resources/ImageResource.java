@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-// @Log
+@Log
 @ApplicationScoped
 @Path("/images")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -44,13 +44,10 @@ public class ImageResource {
     @GET
     @Authenticate
     public Response getImages(@QueryParam("filterIds") List<String> filterIds, @Context ContainerRequest request) {
-        System.out.println("Getting images");
         List<ObjectId> parsedIds = new ArrayList<>();
-        System.out.println("Filter IDs!");
         if (!filterIds.isEmpty()) {
             for (String id : filterIds) {
                 if (!ObjectId.isValid(id)) {
-                    System.out.println("Bad request brah :/");
                     return Response.status(Response.Status.BAD_REQUEST).build();
                 }
                 parsedIds.add(new ObjectId(id));
@@ -65,12 +62,9 @@ public class ImageResource {
             }
         }
          **/
-        System.out.println("Get images");
         List<Image> images = imageBean.getImages(uriInfo, parsedIds);
-        System.out.println("Counting images");
         long count = imageBean.getImagesCount(parsedIds);
 
-        System.out.println("Responding with ok");
         return Response.status(Response.Status.OK)
                 .entity(images)
                 .header("X-Total-Count", count)
