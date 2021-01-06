@@ -36,5 +36,5 @@ kumuluzee:
                        </Loggers>
                    </Configuration>'
 
-rest-config:
-  maintenance-mode: true
+# rest-config:
+  # maintenance-mode: true

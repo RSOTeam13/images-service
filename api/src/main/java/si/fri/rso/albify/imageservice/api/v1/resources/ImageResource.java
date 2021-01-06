@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-@Log
+// @Log
 @ApplicationScoped
 @Path("/images")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -42,30 +42,15 @@ public class ImageResource {
     private RestProperties properties;
 
     @GET
-    @Path("/{imageId}")
-    @Authenticate
-    public Response getImage(@PathParam("imageId") String imageId, @Context ContainerRequest request) {
-        if (!ObjectId.isValid(imageId)) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
-        }
-
-        ImageEntity entity = imageBean.getImage(imageId);
-        if (!entity.getVisible() && !entity.getOwnerId().toString().equals(request.getProperty("userId").toString())) {
-            return Response.status(Response.Status.FORBIDDEN).build();
-        }
-        if (entity == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
-        return Response.status(Response.Status.OK).entity(ImageConverter.toDto(entity)).build();
-    }
-
-    @GET
     @Authenticate
     public Response getImages(@QueryParam("filterIds") List<String> filterIds, @Context ContainerRequest request) {
+        System.out.println("Getting images");
         List<ObjectId> parsedIds = new ArrayList<>();
+        System.out.println("Filter IDs!");
         if (!filterIds.isEmpty()) {
             for (String id : filterIds) {
                 if (!ObjectId.isValid(id)) {
+                    System.out.println("Bad request brah :/");
                     return Response.status(Response.Status.BAD_REQUEST).build();
                 }
                 parsedIds.add(new ObjectId(id));
@@ -80,9 +65,12 @@ public class ImageResource {
             }
         }
          **/
+        System.out.println("Get images");
         List<Image> images = imageBean.getImages(uriInfo, parsedIds);
+        System.out.println("Counting images");
         long count = imageBean.getImagesCount(parsedIds);
 
+        System.out.println("Responding with ok");
         return Response.status(Response.Status.OK)
                 .entity(images)
                 .header("X-Total-Count", count)
@@ -187,6 +175,24 @@ public class ImageResource {
             return Response.status(500, "There was a problem while adding image to album.").build();
         }
         return Response.status(Response.Status.OK).entity(ImageConverter.toDto(updatedEntity)).build();
+    }
+
+    @GET
+    @Path("/{imageId}")
+    @Authenticate
+    public Response getImage(@PathParam("imageId") String imageId, @Context ContainerRequest request) {
+        if (!ObjectId.isValid(imageId)) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+
+        ImageEntity entity = imageBean.getImage(imageId);
+        if (!entity.getVisible() && !entity.getOwnerId().toString().equals(request.getProperty("userId").toString())) {
+            return Response.status(Response.Status.FORBIDDEN).build();
+        }
+        if (entity == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        return Response.status(Response.Status.OK).entity(ImageConverter.toDto(entity)).build();
     }
 
 }

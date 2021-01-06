@@ -20,10 +20,14 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 
     @Override
     public void filter(ContainerRequestContext ctx) throws IOException {
+        System.out.println("Attempting to read header string");
         String authToken = ctx.getHeaderString("Authorization");
+        System.out.println("Setting userId to null");
         String userId = null;
 
+        System.out.println("checking token existence");
         if (authToken != null) {
+            System.out.println("Trying decode");
             try {
                 Algorithm algorithm = Algorithm.HMAC256("secret");
                 JWTVerifier verifier = JWT
@@ -33,16 +37,22 @@ public class AuthenticationFilter implements ContainerRequestFilter {
                 DecodedJWT jwt = verifier.verify(authToken);
 
                 Map<String, Claim> claims = jwt.getClaims();
+                System.out.println("Parsing userId claim");
                 userId = claims.get("userId").asString();
 
             } catch (JWTDecodeException exception) {
+                System.out.println("Caught exception, setting userId to null");
                 userId = null;
             }
         }
 
+        System.out.println("checking user existence");
         if (userId == null) {
+
+            System.out.println("User is null, aborting with unathorized");
             ctx.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
         }
+        System.out.println("Setting user id");
         ctx.setProperty("userId", userId);
     }
 }
