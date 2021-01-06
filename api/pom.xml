@@ -36,6 +36,10 @@
             <groupId>com.kumuluz.ee.cors</groupId>
             <artifactId>kumuluzee-cors</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.kumuluz.ee.fault.tolerance</groupId>
+            <artifactId>kumuluzee-fault-tolerance-smallrye</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
