@@ -4,6 +4,7 @@ import com.kumuluz.ee.cors.annotations.CrossOrigin;
 import com.kumuluz.ee.logs.cdi.Log;
 import org.bson.types.ObjectId;
 import org.eclipse.microprofile.faulttolerance.Bulkhead;
+import org.eclipse.microprofile.faulttolerance.Retry;
 import org.glassfish.jersey.server.ContainerRequest;
 import si.fri.rso.albify.imageservice.config.RestProperties;
 import si.fri.rso.albify.imageservice.lib.Image;
@@ -176,11 +177,17 @@ public class ImageResource {
     @Path("/{imageId}")
     @Authenticate
     @Bulkhead()
-    public Response getImage(@PathParam("imageId") String imageId, @DefaultValue("false") @QueryParam("forceFail") Boolean forceFail, @Context ContainerRequest request) {
+    @Retry
+    public Response getImage(@PathParam("imageId") String imageId, @DefaultValue("false") @QueryParam("forceFail") Boolean forceFail,  @DefaultValue("false") @QueryParam("thirdFail") Boolean thirdFail, @Context ContainerRequest request) {
+        log.info("Getting image " + imageId);
         if (!ObjectId.isValid(imageId) || forceFail) {
+            log.info("Force failing for " + imageId);
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
-
+        if (thirdFail && Math.random() < 1 / 3) {
+            log.info("Unlucky! Fell inro the 33% that fail :/ for img: " + imageId);
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
         ImageEntity entity = imageBean.getImage(imageId);
         if (!entity.getVisible() && !entity.getOwnerId().toString().equals(request.getProperty("userId").toString())) {
             return Response.status(Response.Status.FORBIDDEN).build();
