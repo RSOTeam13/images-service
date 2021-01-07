@@ -13,6 +13,13 @@ kumuluzee:
         allow-origin: "*"
         allow-subdomains: true
         supported-methods: "GET, POST, DELETE, HEAD, OPTIONS, PUT"
+  health:
+    checks:
+      disk-space-health-check:
+        threshold: 100000000
+        type: liveness
+      http-health-check:
+        connection-url: http://www.reddit.com
 
   logs:
     # Change host and port to working current logit.io account.

@@ -25,6 +25,19 @@ spec:
                 secretKeyRef:
                   name: db-secret
                   key: db-url
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 3
+      restartPolicy: Always
 
 ---
 
