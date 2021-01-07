@@ -20,6 +20,7 @@ kumuluzee:
         type: liveness
       http-health-check:
         connection-url: http://www.reddit.com
+        type: liveness
 
   logs:
     # Change host and port to working current logit.io account.
