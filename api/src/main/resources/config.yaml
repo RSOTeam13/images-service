@@ -18,9 +18,9 @@ kumuluzee:
       disk-space-health-check:
         threshold: 100000000
         type: liveness
-      http-health-check:
-        connection-url: http://httpstat.us/200
-        type: liveness
+#      http-health-check:
+#        connection-url: http://httpstat.us/200
+#        type: liveness
 
   logs:
     # Change host and port to working current logit.io account.
