@@ -19,7 +19,7 @@ kumuluzee:
         threshold: 100000000
         type: liveness
       http-health-check:
-        connection-url: http://www.reddit.com
+        connection-url: http://httpstat.us/200
         type: liveness
 
   logs:
